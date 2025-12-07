@@ -59,14 +59,14 @@ const SCORE_CHART = {
 export const drawLetters = () => {
   const pool = [];
   Object.entries(LETTER_POOL).forEach(([letter, freq]) => {
-    for (let i = 0; i < freq; i++) {
+    for (let count = 0; count < freq; count++) {
       pool.push(letter);
     }
   });
 
   const hand = [];
   const poolCopy = pool.slice();
-  for (let i = 0; i < 10; i++) {
+  for (let handCount = 0; handCount < 10; handCount++) {
     const idx = Math.floor(Math.random() * poolCopy.length);
     hand.push(poolCopy[idx]);
     poolCopy.splice(idx, 1);
@@ -77,8 +77,8 @@ export const drawLetters = () => {
 export const usesAvailableLetters = (input, lettersInHand) => {
   if (!input) return true;
   const handCounts = {};
-  for (const l of lettersInHand) {
-    handCounts[l] = (handCounts[l] || 0) + 1;
+  for (const letter of lettersInHand) {
+    handCounts[letter] = (handCounts[letter] || 0) + 1;
   }
 
   const upper = input.toUpperCase();
@@ -104,26 +104,29 @@ export const scoreWord = (word) => {
 
 export const highestScoreFrom = (words) => {
   let best = { word: '', score: 0 };
-  for (const w of words) {
-    const s = scoreWord(w);
-    if (s > best.score) {
-      best = { word: w, score: s };
+  for (const word of words) {
+    const score = scoreWord(word);
+    if (score > best.score) {
+      best = { word: word, score: score };
       continue;
     }
-    if (s === best.score) {
-      if (w.length === 10 && best.word.length !== 10) {
-        best = { word: w, score: s };
-        continue;
-      }
+    if (score < best.score) {
+      continue;
+    }
 
-      if (best.word.length === 10 && w.length !== 10) {
-        continue;
-      }
+    const currentLen = word.length;
+    const bestLen = best.word.length;
 
-      if (w.length < best.word.length) {
-        best = { word: w, score: s };
-        continue;
-      }
+    if (currentLen === 10 && bestLen !== 10) {
+      best = { word, score };
+      continue;
+    }
+    if (bestLen === 10 && currentLen !== 10) {
+      continue;
+    }
+
+    if (currentLen < bestLen) {
+      best = { word, score };
     }
   }
   return best;
